@@ -1,0 +1,187 @@
+diff --git a/include/opus.h b/include/opus.h
+index 0c69c62..2cb0498 100644
+--- a/include/opus.h
++++ b/include/opus.h
+@@ -328,6 +328,32 @@ OPUS_EXPORT void opus_encoder_destroy(OpusEncoder *st);
+ OPUS_EXPORT int opus_encoder_ctl(OpusEncoder *st, int request, ...) OPUS_ARG_NONNULL(1);
+ /**@}*/
+ 
++OPUS_EXPORT int opus_encoder_ctl_set_complexity(OpusEncoder *st, opus_int32 val);
++OPUS_EXPORT int opus_encoder_ctl_get_complexity(OpusEncoder *st, opus_int32* val);
++OPUS_EXPORT int opus_encoder_ctl_set_bitrate(OpusEncoder *st, opus_int32 val);
++OPUS_EXPORT int opus_encoder_ctl_get_bitrate(OpusEncoder *st, opus_int32* val);
++OPUS_EXPORT int opus_encoder_ctl_set_vbr(OpusEncoder *st, opus_int32 val);
++OPUS_EXPORT int opus_encoder_ctl_get_vbr(OpusEncoder *st, opus_int32* val);
++OPUS_EXPORT int opus_encoder_ctl_set_vbr_constraint(OpusEncoder *st, opus_int32 val);
++OPUS_EXPORT int opus_encoder_ctl_get_vbr_constraint(OpusEncoder *st, opus_int32* val);
++OPUS_EXPORT int opus_encoder_ctl_set_force_channels(OpusEncoder *st, opus_int32 val);
++OPUS_EXPORT int opus_encoder_ctl_get_force_channels(OpusEncoder *st, opus_int32* val);
++OPUS_EXPORT int opus_encoder_ctl_set_max_bandwidth(OpusEncoder *st, opus_int32 val);
++OPUS_EXPORT int opus_encoder_ctl_get_max_bandwidth(OpusEncoder *st, opus_int32* val);
++OPUS_EXPORT int opus_encoder_ctl_set_bandwidth(OpusEncoder *st, opus_int32 val);
++OPUS_EXPORT int opus_encoder_ctl_get_bandwidth(OpusEncoder *st, opus_int32* val);
++OPUS_EXPORT int opus_encoder_ctl_set_signal(OpusEncoder *st, opus_int32 val);
++OPUS_EXPORT int opus_encoder_ctl_get_signal(OpusEncoder *st, opus_int32* val);
++OPUS_EXPORT int opus_encoder_ctl_set_application(OpusEncoder *st, opus_int32 val);
++OPUS_EXPORT int opus_encoder_ctl_get_application(OpusEncoder *st, opus_int32* val);
++OPUS_EXPORT int opus_encoder_ctl_get_lookahead(OpusEncoder *st, opus_int32* val);
++OPUS_EXPORT int opus_encoder_ctl_set_inband_fec(OpusEncoder *st, opus_int32 val);
++OPUS_EXPORT int opus_encoder_ctl_get_inband_fec(OpusEncoder *st, opus_int32* val);
++OPUS_EXPORT int opus_encoder_ctl_set_packet_loss_perc(OpusEncoder *st, opus_int32 val);
++OPUS_EXPORT int opus_encoder_ctl_get_packet_loss_perc(OpusEncoder *st, opus_int32* val);
++OPUS_EXPORT int opus_encoder_ctl_set_dtx(OpusEncoder *st, opus_int32 val);
++OPUS_EXPORT int opus_encoder_ctl_get_dtx(OpusEncoder *st, opus_int32* val);
++
+ /** @defgroup opus_decoder Opus Decoder
+   * @{
+   *
+@@ -506,6 +532,11 @@ OPUS_EXPORT OPUS_WARN_UNUSED_RESULT int opus_decode_float(
+   */
+ OPUS_EXPORT int opus_decoder_ctl(OpusDecoder *st, int request, ...) OPUS_ARG_NONNULL(1);
+ 
++OPUS_EXPORT int opus_decoder_ctl_reset_state(OpusDecoder *st);
++OPUS_EXPORT int opus_decoder_ctl_get_final_range(OpusDecoder *st, opus_uint32* val);
++OPUS_EXPORT int opus_decoder_ctl_get_pitch(OpusDecoder *st, opus_int32* val);
++OPUS_EXPORT int opus_decoder_ctl_get_bandwidth(OpusDecoder *st, opus_int32* val);
++
+ /** Frees an <code>OpusDecoder</code> allocated by opus_decoder_create().
+   * @param[in] st <tt>OpusDecoder*</tt>: State to be freed.
+   */
+diff --git a/src/opus_decoder.c b/src/opus_decoder.c
+index 6520e74..d700d11 100644
+--- a/src/opus_decoder.c
++++ b/src/opus_decoder.c
+@@ -972,6 +972,22 @@ bad_arg:
+    return OPUS_BAD_ARG;
+ }
+ 
++int opus_decoder_ctl_reset_state(OpusDecoder *st) {
++   return opus_decoder_ctl(st, OPUS_RESET_STATE);
++}
++
++int opus_decoder_ctl_get_final_range(OpusDecoder *st, opus_uint32* val) {
++   return opus_decoder_ctl(st, OPUS_GET_FINAL_RANGE(val));
++}
++
++int opus_decoder_ctl_get_pitch(OpusDecoder *st, opus_int32* val) {
++   return opus_decoder_ctl(st, OPUS_GET_PITCH(val));
++}
++
++int opus_decoder_ctl_get_bandwidth(OpusDecoder *st, opus_int32* val) {
++   return opus_decoder_ctl(st, OPUS_GET_BANDWIDTH(val));
++}
++
+ void opus_decoder_destroy(OpusDecoder *st)
+ {
+    opus_free(st);
+diff --git a/src/opus_encoder.c b/src/opus_encoder.c
+index 8c8db5a..714f31a 100644
+--- a/src/opus_encoder.c
++++ b/src/opus_encoder.c
+@@ -2774,6 +2774,106 @@ bad_arg:
+     return OPUS_BAD_ARG;
+ }
+ 
++int opus_encoder_ctl_set_complexity(OpusEncoder *st, opus_int32 val) {
++  return opus_encoder_ctl(st, OPUS_SET_COMPLEXITY(val));
++}
++
++int opus_encoder_ctl_get_complexity(OpusEncoder *st, opus_int32* val) {
++  return opus_encoder_ctl(st, OPUS_GET_COMPLEXITY(val));
++}
++
++int opus_encoder_ctl_set_bitrate(OpusEncoder *st, opus_int32 val) {
++  return opus_encoder_ctl(st, OPUS_SET_BITRATE(val));
++}
++
++int opus_encoder_ctl_get_bitrate(OpusEncoder *st, opus_int32* val) {
++  return opus_encoder_ctl(st, OPUS_GET_BITRATE(val));
++}
++
++int opus_encoder_ctl_set_vbr(OpusEncoder *st, opus_int32 val) {
++  return opus_encoder_ctl(st, OPUS_SET_VBR(val));
++}
++
++int opus_encoder_ctl_get_vbr(OpusEncoder *st, opus_int32* val) {
++  return opus_encoder_ctl(st, OPUS_GET_VBR(val));
++}
++
++int opus_encoder_ctl_set_vbr_constraint(OpusEncoder *st, opus_int32 val) {
++  return opus_encoder_ctl(st, OPUS_SET_VBR_CONSTRAINT(val));
++}
++
++int opus_encoder_ctl_get_vbr_constraint(OpusEncoder *st, opus_int32* val) {
++  return opus_encoder_ctl(st, OPUS_GET_VBR_CONSTRAINT(val));
++}
++
++int opus_encoder_ctl_set_force_channels(OpusEncoder *st, opus_int32 val) {
++  return opus_encoder_ctl(st, OPUS_SET_FORCE_CHANNELS(val));
++}
++
++int opus_encoder_ctl_get_force_channels(OpusEncoder *st, opus_int32* val) {
++  return opus_encoder_ctl(st, OPUS_GET_FORCE_CHANNELS(val));
++}
++
++int opus_encoder_ctl_set_max_bandwidth(OpusEncoder *st, opus_int32 val) {
++  return opus_encoder_ctl(st, OPUS_SET_MAX_BANDWIDTH(val));
++}
++
++int opus_encoder_ctl_get_max_bandwidth(OpusEncoder *st, opus_int32* val) {
++  return opus_encoder_ctl(st, OPUS_GET_MAX_BANDWIDTH(val));
++}
++
++int opus_encoder_ctl_set_bandwidth(OpusEncoder *st, opus_int32 val) {
++  return opus_encoder_ctl(st, OPUS_SET_BANDWIDTH(val));
++}
++
++int opus_encoder_ctl_get_bandwidth(OpusEncoder *st, opus_int32* val) {
++  return opus_encoder_ctl(st, OPUS_GET_BANDWIDTH(val));
++}
++
++int opus_encoder_ctl_set_signal(OpusEncoder *st, opus_int32 val) {
++  return opus_encoder_ctl(st, OPUS_SET_SIGNAL(val));
++}
++
++int opus_encoder_ctl_get_signal(OpusEncoder *st, opus_int32* val) {
++  return opus_encoder_ctl(st, OPUS_GET_SIGNAL(val));
++}
++
++int opus_encoder_ctl_set_application(OpusEncoder *st, opus_int32 val) {
++  return opus_encoder_ctl(st, OPUS_SET_APPLICATION(val));
++}
++
++int opus_encoder_ctl_get_application(OpusEncoder *st, opus_int32* val) {
++  return opus_encoder_ctl(st, OPUS_GET_APPLICATION(val));
++}
++
++int opus_encoder_ctl_get_lookahead(OpusEncoder *st, opus_int32* val) {
++  return opus_encoder_ctl(st, OPUS_GET_LOOKAHEAD(val));
++}
++
++int opus_encoder_ctl_set_inband_fec(OpusEncoder *st, opus_int32 val) {
++  return opus_encoder_ctl(st, OPUS_SET_INBAND_FEC(val));
++}
++
++int opus_encoder_ctl_get_inband_fec(OpusEncoder *st, opus_int32* val) {
++  return opus_encoder_ctl(st, OPUS_GET_INBAND_FEC(val));
++}
++
++int opus_encoder_ctl_set_packet_loss_perc(OpusEncoder *st, opus_int32 val) {
++  return opus_encoder_ctl(st, OPUS_SET_PACKET_LOSS_PERC(val));
++}
++
++int opus_encoder_ctl_get_packet_loss_perc(OpusEncoder *st, opus_int32* val) {
++  return opus_encoder_ctl(st, OPUS_GET_PACKET_LOSS_PERC(val));
++}
++
++int opus_encoder_ctl_set_dtx(OpusEncoder *st, opus_int32 val) {
++  return opus_encoder_ctl(st, OPUS_SET_DTX(val));
++}
++
++int opus_encoder_ctl_get_dtx(OpusEncoder *st, opus_int32* val) {
++  return opus_encoder_ctl(st, OPUS_GET_DTX(val));
++}
++
+ void opus_encoder_destroy(OpusEncoder *st)
+ {
+     opus_free(st);
