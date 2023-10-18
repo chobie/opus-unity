@@ -1,9 +1,5 @@
 name: Build with libopus on windows
-on:
-  push:
-    branches:
-    - hoge
-  pull_request:
+on: [workflow_dispatch]
 jobs:
   build-libopus:
     runs-on: windows-2022

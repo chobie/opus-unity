@@ -1,9 +1,5 @@
 name: Build with libopus iOS
-on:
-  push:
-    branches:
-    - hoge
-  pull_request:
+on: [workflow_dispatch]
 jobs:
   build-libopus:
     runs-on: macos-13-large
