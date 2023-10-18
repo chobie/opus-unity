@@ -1,0 +1,36 @@
+name: Build with libopus iOS
+on:
+  push:
+    branches:
+    - hoge
+  pull_request:
+jobs:
+  build-libopus:
+    runs-on: macos-13-large
+    steps:
+    - uses: actions/checkout@v4
+    - name: download package
+      run: curl -L https://downloads.xiph.org/releases/opus/opus-1.4.tar.gz -o opus-1.4.tar.gz
+    - name: unarchive package
+      run: tar zxf opus-1.4.tar.gz
+    - name: build package
+      run: |
+        cd opus-1.4
+        patch -p1 < ${{ github.workspace }}/Assets/Opus/Editor/opus1.4.patch
+        ./configure \
+          --enable-float-approx \
+          --disable-shared \
+          --enable-static \
+          --with-pic \
+          --disable-extra-programs \
+          --disable-doc \
+          --host=arm-apple-darwin \
+          LDFLAGS="-flto -fPIE" \
+          CFLAGS="-Ofast -flto -g -arch arm64"
+        make
+    - name: Archive production artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: libopus-ios
+        path: |
+          opus-1.4/.libs/libopus.a

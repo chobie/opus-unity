@@ -1,0 +1,37 @@
+name: Build with libopus on windows
+on:
+  push:
+    branches:
+    - hoge
+  pull_request:
+jobs:
+  build-libopus:
+    runs-on: windows-2022
+    timeout-minutes: 5
+    steps:
+    - uses: actions/checkout@v4
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v1.1
+    - name: download package
+      run: curl -L https://downloads.xiph.org/releases/opus/opus-1.4.tar.gz -o opus-1.4.tar.gz
+    - name: unarchive package
+      shell: bash
+      run: tar zxf opus-1.4.tar.gz
+    - name: apply patch
+      shell: bash
+      run: |
+        cd opus-1.4
+        patch -p1 < $GITHUB_WORKSPACE\\Assets\\Opus\\Editor\\opus1.4.patch
+    - name: build package
+      run: |
+        cd opus-1.4
+        mkdir _build
+        cd _build
+        cmake -G "Visual Studio 17 2022" -A "x64" -DOPUS_BUILD_SHARED_LIBRARY=ON ..
+        msbuild Opus.sln /maxcpucount /property:Configuration=Release,Platform=x64
+    - name: Archive production artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: libopus-windows-x64
+        path: |
+          opus-1.4\\_build\\Release
